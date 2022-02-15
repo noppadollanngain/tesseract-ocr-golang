@@ -25,7 +25,9 @@ RUN apt-get install -y -qq \
   tesseract-ocr-deu \
   tesseract-ocr-jpn
 
-COPY ./src/go.mod ./src/go.sum ./
+RUN go get -u github.com/cosmtrek/air
+
+COPY ./src/.air.toml ./src/go.mod ./src/go.sum ./
 RUN go mod tidy
 RUN go mod download
 

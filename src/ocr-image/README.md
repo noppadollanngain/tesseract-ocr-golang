@@ -1,0 +1,1 @@
+# tesseract-ocr-golang tmp file image
