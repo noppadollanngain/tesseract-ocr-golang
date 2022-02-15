@@ -21,9 +21,7 @@ ENV TESSDATA_PREFIX=/usr/share/tesseract-ocr/4.00/tessdata/
 # Load languages.
 # These {lang}.traineddata would b located under ${TESSDATA_PREFIX}/tessdata.
 RUN apt-get install -y -qq \
-  tesseract-ocr-eng \
-  tesseract-ocr-deu \
-  tesseract-ocr-jpn
+  tesseract-ocr-eng
 
 RUN go get -u github.com/cosmtrek/air
 

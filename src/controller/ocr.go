@@ -30,20 +30,29 @@ func (ocr *OCRController) ProcessImage(c *fiber.Ctx) error {
 	}
 	tNow := time.Now()
 	directory := fmt.Sprintf("./%s/%d-%s", TEMPFILE_OCR_DIRECTORY, tNow.Unix(), file.Filename)
-	c.SaveFile(file, directory)
-	defer func() {
-		os.Remove(directory)
+
+	ch := make(chan string)
+	client := gosseract.NewClient()
+
+	go func() {
+		c.SaveFile(file, directory)
+		client.SetImage(directory)
+		text, err := client.Text()
+		if err != nil {
+			ch <- "Error"
+		} else {
+			ch <- text
+		}
 	}()
 
-	client := gosseract.NewClient()
-	defer client.Close()
+	go func() {
+		<-ch
+		os.Remove(directory)
+		client.Close()
+	}()
 
-	client.SetImage(directory)
-	text, err := client.Text()
-	if err != nil {
-		status, resData := response.InternalServerError("")
-		return c.Status(status).JSON(resData)
-	}
+	text := <-ch
+	ch <- "remove"
 
 	status, resData := response.Item(text, "")
 	return c.Status(status).JSON(resData)
